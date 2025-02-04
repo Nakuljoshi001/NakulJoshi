@@ -1,20 +1,17 @@
-# Use an official PHP runtime as a parent image
+# Use official PHP image as base
 FROM php:7.4-apache
 
 # Set the working directory
 WORKDIR /var/www/html
 
-# Copy the current directory contents into the container
+# Copy project files to container
 COPY . .
 
-# Install any needed dependencies
+# Install any required dependencies
 RUN docker-php-ext-install pdo pdo_mysql
 
-# Make sure the public folder is served in Laravel apps
-RUN ln -s /var/www/html/public /var/www/html/public_html
-
-# Expose port 80 for the web server
+# Expose port 80 for web server
 EXPOSE 80
 
-# Start Apache service
+# Start the apache server
 CMD ["apache2-foreground"]
