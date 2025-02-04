@@ -1,33 +1,20 @@
-# Use the official PHP image with Apache
-FROM php:8.2-apache
+# Use an official PHP runtime as a parent image
+FROM php:7.4-apache
 
-# Set working directory
+# Set the working directory
 WORKDIR /var/www/html
 
-# Install required packages
-RUN apt-get update && apt-get install -y \
-    libpng-dev \
-    libjpeg-dev \
-    libfreetype6-dev \
-    zip \
-    unzip \
-    curl \
-    git \
-    && docker-php-ext-install pdo pdo_mysql gd
-
-# Enable Apache mod_rewrite
-RUN a2enmod rewrite
-
-# Copy Laravel application
+# Copy the current directory contents into the container
 COPY . .
 
-# Install Composer dependencies
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-RUN composer install --no-dev --optimize-autoloader
+# Install any needed dependencies
+RUN docker-php-ext-install pdo pdo_mysql
 
-# Set permissions
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+# Make sure the public folder is served in Laravel apps
+RUN ln -s /var/www/html/public /var/www/html/public_html
 
-# Expose port 80
+# Expose port 80 for the web server
 EXPOSE 80
+
+# Start Apache service
+CMD ["apache2-foreground"]
